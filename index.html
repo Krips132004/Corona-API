@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Corona Tracker</title>
+  <link rel="stylesheet" href="style.css">
+  <body>
+    <div class="container">
+    <h1>🌍 Corona Tracker</h1>
+    <input type="text" id="country" placeholder="Enter country (e.g. India)">
+    <br>
+    <button onclick="getData()">Search</button>
+
+    <div class="result" id="result">
+      <p>Enter a country and click search.</p>
+    </div>
+  </div>
+
+   
+  <script>
+    async function getData() {
+      const country = document.getElementById("country").value.trim();
+      const resultDiv = document.getElementById("result");
+
+      if (!country) {
+        resultDiv.innerHTML = "<p>Please enter a country name.</p>";
+        return;
+      }
+
+      try {
+        const res = await fetch(`https://disease.sh/v3/covid-19/countries/${country}`);
+        if (!res.ok) throw new Error("Country not found");
+        const data = await res.json();
+
+        resultDiv.innerHTML = `
+          <img src="${data.countryInfo.flag}" alt="Flag">
+          <h2>${data.country}</h2>
+          <div class="stats">
+            <div class="card">
+              <p class="stat-title">🦠 Cases</p>
+              <p class="stat-value">${data.cases.toLocaleString()}</p>
+            </div>
+            <div class="card">
+              <p class="stat-title">➕ Today Cases</p>
+              <p class="stat-value">${data.todayCases.toLocaleString()}</p>
+            </div>
+            <div class="card">
+              <p class="stat-title">☠️ Deaths</p>
+              <p class="stat-value">${data.deaths.toLocaleString()}</p>
+            </div>
+            <div class="card">
+              <p class="stat-title">❤️ Recovered</p>
+              <p class="stat-value">${data.recovered.toLocaleString()}</p>
+            </div>
+            <div class="card">
+              <p class="stat-title">🔥 Active</p>
+              <p class="stat-value">${data.active.toLocaleString()}</p>
+            </div>
+            <div class="card">
+              <p class="stat-title">🧪 Tests</p>
+              <p class="stat-value">${data.tests.toLocaleString()}</p>
+            </div>
+          </div>
+        `;
+      } catch (error) {
+        resultDiv.innerHTML = `<p style="color: #ff4d4d;">${error.message}</p>`;
+      }
+    }
+  </script>
+</body>
+</html>
